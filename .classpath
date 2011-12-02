@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="bin/" sourcepath="src"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="lib/hadoop-0.19.2-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jmljunitruntime.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jmlmodels.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jmlmodelsnonrac.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jmlruntime.jar"/>
+	<classpathentry kind="lib" path="lib/jgap.jar"/>
+	<classpathentry kind="lib" path="lib/javassist.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

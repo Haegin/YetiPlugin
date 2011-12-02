@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="toc.xml"
+            primary="true">
+      </toc>
+      <toc
+            file="tocconcepts.xml">
+      </toc>
+      <toc
+            file="tocgettingstarted.xml">
+      </toc>
+      <toc
+            file="tocreference.xml">
+      </toc>
+      <toc
+            file="tocsamples.xml">
+      </toc>
+      <toc
+            file="toctasks.xml">
+      </toc>
+   </extension>
+   
+   <!-- Yeti Popup Menu defination -->
+   
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="YetiPlugIn.Menucontribution"
+            nameFilter="*.java"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               label="%popupmenu.title"
+               path="additions"
+               id="YetiPlugIn.menu1">
+            <separator
+                  name="group1">
+            </separator>
+         </menu>
+         
+        
+         <action
+               label="%popupmenu.check"
+               class="yetiplugin.popup.actions.CheckCodeAction"
+               menubarPath="YetiPlugIn.menu1/group1"
+               enablesFor="1"
+               id="YetiPlugIn.CheckCodeWithYeti">
+         </action>
+         
+         <action
+               label="%popupmenu.clear"
+               class="yetiplugin.popup.actions.ClearMarkerAction"
+               menubarPath="YetiPlugIn.menu1/group1"
+               enablesFor="1"
+               id="YetiPlugIn.ClearYetiMarkers">
+         </action>
+          
+         <action
+               label="%popupmenu.preference"
+               class="yetiplugin.popup.actions.PreferenceAction"
+               menubarPath="YetiPlugIn.menu1/group1"
+               enablesFor="1"
+               id="YetiPlugIn.YetiPreferences">
+         </action>
+                 
+         <action
+               label="%popupmenu.showgraph"
+               class="yetiplugin.popup.actions.ShowGraphAction"
+               menubarPath="YetiPlugIn.menu1/group1"
+               enablesFor="1"
+               id="YetiPlugIn.ShowYetiGraphPopup">
+         </action>
+         
+   </objectContribution>
+   </extension>
+   
+   
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            name="%preferences"
+            class="yetiplugin.preferences.PreferenceSettingsPage"
+            id="yetiplugin.preferences.YetiPreferencePage">
+      </page>
+      
+   </extension>
+   
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="yetiplugin.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   
+    
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="%view.title"
+            id="YetiPlugIn">
+      </category>
+      <view
+            name="%view.outline"
+            icon="icons/sample.gif"
+            category="YetiPlugIn"
+            class="yetiplugin.views.OutlineView"
+            id="yetiplugin.views.YetiOutlineView">
+      </view>
+          <view
+            name="%view.overview"
+            icon="icons/sample.gif"
+            category="YetiPlugIn"
+            class="yetiplugin.views.ViewTestCase"
+            id="yetiplugin.views.YetiOverview">
+      </view>
+      
+          <view
+            name="%view.graph"
+            icon="icons/sample.gif"
+            category="YetiPlugIn"
+            class="yetiplugin.views.ViewGraph"
+            id="yetiplugin.views.YetiViewGraph">
+      </view>
+      
+       <view
+            name="%view.summary"
+            icon="icons/sample.gif"
+            category="YetiPlugIn"
+            class="yetiplugin.views.ViewSummary"
+            id="yetiplugin.views.ViewSummary">
+      </view>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               ratio="0.5"
+               relative="org.eclipse.ui.views.TaskList"
+               relationship="right"
+               id="yetiplugin.views.YetiOutlineView">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   
+   <extension
+  
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+   
+   <extension id="yeti.YetiMarker" point="org.eclipse.core.resources.markers" name="Yeti Marker"> 
+      <persistent value="true"/> 
+      <super type="org.eclipse.core.resources.problemmarker"/> 
+      <super type="org.eclipse.core.resources.textmarker"/> 
+      <attribute name="owner"/> 
+   </extension>
+   
+   <extension  point="org.eclipse.ui.ide.markerSupport">
+   		<markerContentGenerator id="yetiplugin.YetiMarkerGenerator" name="Yeti Marker Generator">
+	        <markerTypeReference   id="yeti.YetiMarker"/>
+	   		<markerFieldReference  id="org.eclipse.ui.ide.priorityField"/>
+	        <markerFieldReference  id="org.eclipse.ui.ide.severityAndDescriptionField"/>
+	  		<markerFieldReference  id="org.eclipse.ui.ide.locationField"/>
+	   		<markerFieldReference  id="org.eclipse.ui.ide.resourceField"/> 
+	    </markerContentGenerator>
+   </extension>
+
+	<extension point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+         markerType="yeti.YetiMarker"
+         class="yetiplugin.marker.QuickFixer"/>
+   </extension>
+
+</plugin>

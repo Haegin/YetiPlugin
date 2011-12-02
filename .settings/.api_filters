@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="YetiPlugIn" version="2">
+    <resource path="src/yetiplugin/views/Overview.java" type="yetiplugin.views.Overview">
+        <filter id="576725006">
+            <message_arguments>
+                <message_argument value="IOverview"/>
+                <message_argument value="Overview"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>

@@ -56,18 +56,15 @@ public class YetiJavaTestManager extends YetiTestManager {
 	 */
 	private static class CallerThread extends Thread{
 
-
 		/**
 		 * The strategy used to pick the next method call and the instances.
 		 */
 		private YetiStrategy strategy = null;
 
-
 		/**
 		 * The module containing the routines to test.
 		 */
 		private YetiModule mod = null;
-
 
 		private Object callLock;
 
@@ -81,7 +78,6 @@ public class YetiJavaTestManager extends YetiTestManager {
 			super(tg,Name);
 		}
 
-
 		/**
 		 * Gets the YetiStrategy for the next method call.
 		 * @return  the strategy previously set.
@@ -90,7 +86,6 @@ public class YetiJavaTestManager extends YetiTestManager {
 		public YetiStrategy getStrategy() {
 			return strategy;
 		}
-
 
 		/**
 		 * Sets the YetiStrategy for the next method call.
@@ -113,7 +108,6 @@ public class YetiJavaTestManager extends YetiTestManager {
 			this.callLock=callLock;
 		}
 
-
 		/**
 		 * Gets the YetiModule to use to make the call.
 		 * @return  the YetiModule used to pick the next method to test.
@@ -122,7 +116,6 @@ public class YetiJavaTestManager extends YetiTestManager {
 		public YetiModule getMod() {
 			return mod;
 		}
-
 
 		/**
 		 * Sets the YetiModule for picking the next method to call.
@@ -162,8 +155,6 @@ public class YetiJavaTestManager extends YetiTestManager {
 		public Object thisLock = new Object();
 
 		private long lastCallNumber;
-
-
 
 		/* (non-Javadoc)
 		 * 
@@ -208,11 +199,14 @@ public class YetiJavaTestManager extends YetiTestManager {
 							callLock.notifyAll();
 						}
 					}
+					System.out.println("OUt of the while loop");
 				}
 			} catch (InterruptedException e) {
+				System.out.println("Interrupted");
 				// Normal thread stop
 				// triggered by the stopTesting
 			}
+			System.out.println("Stopping thread");
 		}
 
 	}
@@ -343,14 +337,14 @@ public class YetiJavaTestManager extends YetiTestManager {
 		//(which it should be doing even if it was just restarted)
 		try {
 			Thread.sleep(timeout);
-			if (ct.isWaiting) {
+			if (ct != null && ct.isWaiting) {
 				ct.interrupt();
 				Thread.sleep(0,250);
 			}
 			// we make sure that the logs are not cut
 			synchronized (YetiLog.class) {
 				// we stop the thread anyway!
-				ct.stop();
+				ct.stopRunning();
 			}
 			nThreadsStopped++;
 		} catch (Throwable e) {
@@ -380,18 +374,30 @@ public class YetiJavaTestManager extends YetiTestManager {
 			numThreads = workersGroup.enumerate(threads, false);
 			Thread thread;
 			CallerThread cthread;
+			System.out.println("There are " + numThreads + " running.");
 			for (int i=0; i<numThreads; i++) {
 				thread = threads[i];
 				if (thread instanceof CallerThread) {
 					cthread = (CallerThread)thread;
 					cthread.stopRunning();
-				} else {
-					thread.interrupt();
 				}
+				thread.interrupt();
+				while (thread.isAlive()) {
+					try {
+						thread.sleep(50);
+					} catch (InterruptedException e) {
+					}
+				}
+				System.out.println("Nope :(");
 			}
 			
 			// now we can destroy the thread group
-			workersGroup.destroy();
+			try {
+				workersGroup.destroy();
+			} catch (IllegalThreadStateException ex) {
+				System.out.println("Threads are still running in the workers group");
+				ex.printStackTrace();
+			}
 		}
 		System.out.println("Recreating workersGroup");
 		workersGroup= new ThreadGroup("workers");

@@ -1,0 +1,4 @@
+*.class
+*.sw[opn]
+bin/*
+

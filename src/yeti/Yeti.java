@@ -1040,7 +1040,6 @@ public class Yeti {
 			if (Yeti.pl instanceof YetiJavaProperties) {
 				YetiJavaMethod.reset();
 				YetiJavaTestManager.reset();
-				System.out.println("2");
 			}
 			System.out.println("Reset Properties");
 			// TODO add the same code for other programming languages

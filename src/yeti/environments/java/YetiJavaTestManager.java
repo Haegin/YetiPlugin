@@ -49,6 +49,7 @@ import yeti.environments.YetiTestManager;
  */
 public class YetiJavaTestManager extends YetiTestManager {
 
+<<<<<<< HEAD
 	/**
 	 * Class that represents a thread that makes the next method call.
 	 * 
@@ -228,6 +229,8 @@ public class YetiJavaTestManager extends YetiTestManager {
 		}
 
 	}
+=======
+>>>>>>> 1a2dd8355473cc3e7a0503aec392ae506d76c850
 
 	/**
 	 * The current caller thread.
@@ -321,7 +324,6 @@ public class YetiJavaTestManager extends YetiTestManager {
 					System.out.println("STOPPING");
 					// this never stops the thread...
 					while (ct.isAlive()) {
-						ct.stopRunning();
 						ct.interrupt();
 					}
 					nThreadsStopped++;
@@ -339,7 +341,6 @@ public class YetiJavaTestManager extends YetiTestManager {
 	 * 
 	 * @see yeti.environments.YetiTestManager#stopTesting()
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public void stopTesting() {
 		// we call the parent
@@ -362,7 +363,7 @@ public class YetiJavaTestManager extends YetiTestManager {
 			synchronized (YetiLog.class) {
 				// we stop the thread if it's alive
 				if (ct != null && ct.isAlive()) {
-					ct.stopRunning();
+					ct.interrupt();
 				}
 			}
 			nThreadsStopped++;
@@ -426,4 +427,171 @@ public class YetiJavaTestManager extends YetiTestManager {
 		System.out.println("Returning");
 	}
 
+<<<<<<< HEAD
+=======
+	/**
+	 * Class that represents a thread that makes the next method call.
+	 * @author  Manuel Oriol (manuel@cs.york.ac.uk)
+	 * @date  Jul 9, 2009
+	 */
+	private static class CallerThread extends Thread{
+
+		/**
+		 * The strategy used to pick the next method call and the instances.
+		 */
+		private YetiStrategy strategy = null;
+
+		/**
+		 * The module containing the routines to test.
+		 */
+		private YetiModule mod = null;
+
+		private Object callLock;
+		
+		/**
+		 * Used to know whether the thread is waiting for incoming tasks.
+		 */
+		private boolean isWaiting = false;
+
+		/**
+		 * Used to know whether the thread has started or not.
+		 */
+		private boolean hasStarted = false;
+		
+		/**
+		 * Used to stop the thread
+		 */
+		private boolean keepRunning = true;
+		
+		/**
+		 * This object is used to synchronize with the manager.
+		 * Originally the synchronization was made on the CallerThread but
+		 * stop() waits for the lock to be released on the thread itself!!!!
+		 * 
+		 *  Real issue: this is not documented in SUN's API.
+		 *  Real real issue: using stop() in the first place - it's deprecated
+		 */
+		private Object thisLock = new Object();
+
+		private long lastCallNumber;
+
+		/**
+		 * Simple constructor.
+		 * 
+		 * @param strategy the strategy to use.
+		 * @param mod the module to test.
+		 */
+		public CallerThread(ThreadGroup tg,String Name) {
+			super(tg,Name);
+		}
+
+		/**
+		 * Gets the YetiStrategy for the next method call.
+		 * @return  the strategy previously set.
+		 */
+		@SuppressWarnings("unused")
+		public YetiStrategy getStrategy() {
+			return strategy;
+		}
+
+		/**
+		 * Sets the YetiStrategy for the next method call.
+		 * @param strategy  the new strategy.
+		 */
+		@SuppressWarnings("unused")
+		public void setStrategy(YetiStrategy strategy) {
+			this.strategy = strategy;
+		}
+
+		/**
+		 * Sets both Module and strategy.
+		 * 
+		 * @param strategy the new strategy.
+		 * @param mod the YetiModule to set.
+		 */
+		public void setModAndStrategyAndCallLock(YetiModule mod, YetiStrategy strategy, Object callLock) {
+			this.strategy = strategy;
+			this.mod = mod;
+			this.callLock=callLock;
+		}
+
+		/**
+		 * Gets the YetiModule to use to make the call.
+		 * @return  the YetiModule used to pick the next method to test.
+		 */
+		@SuppressWarnings("unused")
+		public YetiModule getMod() {
+			return mod;
+		}
+
+		/**
+		 * Sets the YetiModule for picking the next method to call.
+		 * @param mod  the YetiModule to set.
+		 */
+		@SuppressWarnings("unused")
+		public void setMod(YetiModule mod) {
+			this.mod = mod;
+		}
+
+		/* (non-Javadoc)
+		 * 
+		 * Simple caller for running the call in a separate thread.
+		 * 
+		 * @see java.lang.Thread#run()
+		 */
+		public void run() {
+			lastCallNumber = 0;
+
+			// we basically have a double handshake
+			while (keepRunning) {
+				try {
+				// beginning of the double handshake
+					synchronized (thisLock) {
+						hasStarted=true;
+	
+						// it takes requests indefinitely until it is interrupted
+						// we print the logs
+						YetiLog.printDebugLog("Worker thread will wait on the lock", this);
+						// we wait
+						thisLock.wait();
+						YetiLog.printDebugLog("Worker thread has waited the lock", this);
+
+						// we pick the routine
+						YetiRoutine r = strategy.getNextRoutine(mod);
+
+						// if there is a routine...
+						if (r != null) {
+							try {
+								// we make the actual call
+								r.makeCall(strategy.getAllCards(r));
+							} catch (ImpossibleToMakeConstructorException e) {
+								// Ignore calls that do not allow to make new instances
+								//e.printStackTrace();
+							}
+							lastCallNumber++;
+						}
+						YetiLog.printDebugLog("Worker thread will notify testmanager",this);
+						// we wake the main thread up
+						synchronized(callLock) {
+							callLock.notifyAll();
+						}
+					}
+				} catch (InterruptedException e) {
+					System.out.println("Interrupted");
+					// Normal thread stop
+					keepRunning = false;
+					// triggered by the stopTesting
+				}
+				if (this.isInterrupted()) {
+					keepRunning = false;
+				}
+			System.out.println("Looping");
+			}
+			System.out.println("Stopping thread");
+		}
+
+	}
+	/* end of CallerThread class definition */
+
+>>>>>>> 1a2dd8355473cc3e7a0503aec392ae506d76c850
 }

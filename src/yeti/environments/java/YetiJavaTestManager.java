@@ -1,12 +1,12 @@
 package yeti.environments.java;
 
 /**
- 
+
  YETI - York Extensible Testing Infrastructure
- 
+
  Copyright (c) 2009-2010, Manuel Oriol <manuel.oriol@gmail.com> - University of York
  All rights reserved.
- 
+
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  1. Redistributions of source code must retain the above copyright
@@ -20,7 +20,7 @@ package yeti.environments.java;
  4. Neither the name of the University of York nor the
  names of its contributors may be used to endorse or promote products
  derived from this software without specific prior written permission.
- 
+
  THIS SOFTWARE IS PROVIDED BY <COPYRIGHT HOLDER> ''AS IS'' AND ANY
  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,9 +31,8 @@ package yeti.environments.java;
  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- 
- **/ 
 
+ **/
 
 import yeti.ImpossibleToMakeConstructorException;
 import yeti.YetiLog;
@@ -44,17 +43,19 @@ import yeti.environments.YetiTestManager;
 
 /**
  * Class that represents a test manager for Java
- * @author  Manuel Oriol (manuel@cs.york.ac.uk)
- * @date  Jun 22, 2009
+ * 
+ * @author Manuel Oriol (manuel@cs.york.ac.uk)
+ * @date Jun 22, 2009
  */
 public class YetiJavaTestManager extends YetiTestManager {
 
 	/**
 	 * Class that represents a thread that makes the next method call.
-	 * @author  Manuel Oriol (manuel@cs.york.ac.uk)
-	 * @date  Jul 9, 2009
+	 * 
+	 * @author Manuel Oriol (manuel@cs.york.ac.uk)
+	 * @date Jul 9, 2009
 	 */
-	private static class CallerThread extends Thread{
+	private static class CallerThread extends Thread {
 
 		/**
 		 * The strategy used to pick the next method call and the instances.
@@ -67,21 +68,23 @@ public class YetiJavaTestManager extends YetiTestManager {
 		private YetiModule mod = null;
 
 		private Object callLock;
-		
 
 		/**
 		 * Simple constructor.
 		 * 
-		 * @param strategy the strategy to use.
-		 * @param mod the module to test.
+		 * @param strategy
+		 *            the strategy to use.
+		 * @param mod
+		 *            the module to test.
 		 */
-		public CallerThread(ThreadGroup tg,String Name) {
-			super(tg,Name);
+		public CallerThread(ThreadGroup tg, String Name) {
+			super(tg, Name);
 		}
 
 		/**
 		 * Gets the YetiStrategy for the next method call.
-		 * @return  the strategy previously set.
+		 * 
+		 * @return the strategy previously set.
 		 */
 		@SuppressWarnings("unused")
 		public YetiStrategy getStrategy() {
@@ -90,7 +93,9 @@ public class YetiJavaTestManager extends YetiTestManager {
 
 		/**
 		 * Sets the YetiStrategy for the next method call.
-		 * @param strategy  the new strategy.
+		 * 
+		 * @param strategy
+		 *            the new strategy.
 		 */
 		@SuppressWarnings("unused")
 		public void setStrategy(YetiStrategy strategy) {
@@ -100,18 +105,22 @@ public class YetiJavaTestManager extends YetiTestManager {
 		/**
 		 * Sets both Module and strategy.
 		 * 
-		 * @param strategy the new strategy.
-		 * @param mod the YetiModule to set.
+		 * @param strategy
+		 *            the new strategy.
+		 * @param mod
+		 *            the YetiModule to set.
 		 */
-		public void setModAndStrategyAndCallLock(YetiModule mod, YetiStrategy strategy, Object callLock) {
+		public void setModAndStrategyAndCallLock(YetiModule mod,
+		        YetiStrategy strategy, Object callLock) {
 			this.strategy = strategy;
 			this.mod = mod;
-			this.callLock=callLock;
+			this.callLock = callLock;
 		}
 
 		/**
 		 * Gets the YetiModule to use to make the call.
-		 * @return  the YetiModule used to pick the next method to test.
+		 * 
+		 * @return the YetiModule used to pick the next method to test.
 		 */
 		@SuppressWarnings("unused")
 		public YetiModule getMod() {
@@ -120,7 +129,9 @@ public class YetiJavaTestManager extends YetiTestManager {
 
 		/**
 		 * Sets the YetiModule for picking the next method to call.
-		 * @param mod  the YetiModule to set.
+		 * 
+		 * @param mod
+		 *            the YetiModule to set.
 		 */
 		@SuppressWarnings("unused")
 		public void setMod(YetiModule mod) {
@@ -136,28 +147,30 @@ public class YetiJavaTestManager extends YetiTestManager {
 		 * Used to know whether the thread has started or not.
 		 */
 		boolean hasStarted = false;
-		
+
 		/**
 		 * Used to stop the thread
 		 */
 		private boolean keepRunning = true;
-		
+
 		public void stopRunning() {
+			System.out.println("I've been told to stop");
 			keepRunning = false;
 		}
 
 		/**
-		 * This object is used to synchronize with the manager.
-		 * Originally the synchronization was made on the CallerThread but
-		 * stop() waits for the lock to be released on the thread itself!!!!
+		 * This object is used to synchronize with the manager. Originally the
+		 * synchronization was made on the CallerThread but stop() waits for the
+		 * lock to be released on the thread itself!!!!
 		 * 
-		 *  Real issue: this is not documented in SUN's API.
+		 * Real issue: this is not documented in SUN's API.
 		 */
 		public Object thisLock = new Object();
 
 		private long lastCallNumber;
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * 
 		 * Simple caller for running the call in a separate thread.
 		 * 
@@ -170,15 +183,17 @@ public class YetiJavaTestManager extends YetiTestManager {
 			try {
 				// beginning of the double handshake
 				synchronized (thisLock) {
-					hasStarted=true;
+					hasStarted = true;
 
 					// it takes requests indefinitely until it is interrupted
 					while (keepRunning) {
 						// we print the logs
-						YetiLog.printDebugLog("Worker thread will wait on the lock", this);
+						YetiLog.printDebugLog(
+						        "Worker thread will wait on the lock", this);
 						// we wait
 						thisLock.wait();
-						YetiLog.printDebugLog("Worker thread has waited the lock", this);
+						YetiLog.printDebugLog(
+						        "Worker thread has waited the lock", this);
 
 						// we pick the routine
 						YetiRoutine r = strategy.getNextRoutine(mod);
@@ -189,14 +204,16 @@ public class YetiJavaTestManager extends YetiTestManager {
 								// we make the actual call
 								r.makeCall(strategy.getAllCards(r));
 							} catch (ImpossibleToMakeConstructorException e) {
-								// Ignore calls that do not allow to make new instances
-								//e.printStackTrace();
+								// Ignore calls that do not allow to make new
+								// instances
+								// e.printStackTrace();
 							}
 							lastCallNumber++;
 						}
-						YetiLog.printDebugLog("Worker thread will notify testmanager",this);
+						YetiLog.printDebugLog(
+						        "Worker thread will notify testmanager", this);
 						// we wake the main thread up
-						synchronized(callLock) {
+						synchronized (callLock) {
 							callLock.notifyAll();
 						}
 					}
@@ -231,11 +248,14 @@ public class YetiJavaTestManager extends YetiTestManager {
 	 * A thread group to which all workers belong.
 	 */
 	public static ThreadGroup workersGroup = new ThreadGroup("workers");
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * 
 	 * We make the call.
 	 * 
-	 * @see yeti.environments.YetiTestManager#makeNextCall(yeti.YetiModule, yeti.YetiStrategy)
+	 * @see yeti.environments.YetiTestManager#makeNextCall(yeti.YetiModule,
+	 * yeti.YetiStrategy)
 	 */
 	@Override
 	public void makeNextCall(YetiModule mod, YetiStrategy strategy) {
@@ -243,27 +263,28 @@ public class YetiJavaTestManager extends YetiTestManager {
 		Object callLock = new Object();
 
 		// we start the double handshake
-		synchronized(callLock) {
+		synchronized (callLock) {
 
 			// we get the time for the timeout
 			long timeout = getTimeoutInMilliseconds();
 
 			// if this is the first time we make a call, we actually
 			// create the worker thread
-			if (ct==null || !ct.isAlive()) {
-				YetiLog.printDebugLog("Restarting Worker thread",this);
-				ct=new CallerThread(workersGroup,"WorkerThread_"+nThreadsStarted);
+			if (ct == null || !ct.isAlive()) {
+				YetiLog.printDebugLog("Restarting Worker thread", this);
+				ct = new CallerThread(workersGroup, "WorkerThread_"
+				        + nThreadsStarted);
 				ct.start();
 				nThreadsStarted++;
 			}
 
-
 			// we wait until the worker thread has started
-			while(!ct.hasStarted) {
+			while (!ct.hasStarted) {
 				try {
-					YetiLog.printDebugLog("Waiting for the thread to start",this);
+					YetiLog.printDebugLog("Waiting for the thread to start",
+					        this);
 					// Default value 250 nanoseconds
-					Thread.sleep(0,250);
+					Thread.sleep(0, 250);
 				} catch (InterruptedException e) {
 					// should never happen
 					e.printStackTrace();
@@ -276,24 +297,25 @@ public class YetiJavaTestManager extends YetiTestManager {
 				ct.setModAndStrategyAndCallLock(mod, strategy, callLock);
 
 				// we wake up the worker thread
-				YetiLog.printDebugLog("Main thread has synchronized on the lock",this);
+				YetiLog.printDebugLog(
+				        "Main thread has synchronized on the lock", this);
 				ct.thisLock.notifyAll();
-				callNumber=ct.lastCallNumber;
+				callNumber = ct.lastCallNumber;
 			}
 
-			// we wait until the timeout 
+			// we wait until the timeout
 			try {
-				YetiLog.printDebugLog("Waiting with timeout: "+timeout,this);
+				YetiLog.printDebugLog("Waiting with timeout: " + timeout, this);
 				callLock.wait(timeout);
 			} catch (InterruptedException e) {
 				// should never happen
 				YetiLog.printDebugLog("Main thread Interrupted", this);
 
-				//e.printStackTrace();
+				// e.printStackTrace();
 			}
 			// if the call has not done another call and the thread is alive
 			// we stop it!
-			if (ct.isAlive()&&(ct.lastCallNumber==callNumber)) {
+			if (ct.isAlive() && (ct.lastCallNumber == callNumber)) {
 				try {
 					YetiLog.printDebugLog("Stopping the Worker Thread", this);
 					System.out.println("STOPPING");
@@ -301,22 +323,19 @@ public class YetiJavaTestManager extends YetiTestManager {
 					while (ct.isAlive()) {
 						ct.stopRunning();
 						ct.interrupt();
-						Thread.sleep(0,250);
 					}
 					nThreadsStopped++;
 				} catch (Throwable t) {
 					// Should not really matter here.
-					//t.printStackTrace();
+					// t.printStackTrace();
 				}
-				ct=null;
+				ct = null;
 			}
 		}
 	}
 
-
-
-	/* (non-Javadoc)
-	 * Will stop the caller thread.
+	/*
+	 * (non-Javadoc) Will stop the caller thread.
 	 * 
 	 * @see yeti.environments.YetiTestManager#stopTesting()
 	 */
@@ -326,18 +345,18 @@ public class YetiJavaTestManager extends YetiTestManager {
 		// we call the parent
 		super.stopTesting();
 		// we offset the timeout time.
-		long timeout = getTimeoutInMilliseconds()/10;
-		if (timeout>50L) {
-			timeout=50L;
+		long timeout = getTimeoutInMilliseconds() / 10;
+		if (timeout > 50L) {
+			timeout = 50L;
 		}
 		// we wait for the timeout time
-		// then we interrupt the thread if it is waiting 
-		//(which it should be doing even if it was just restarted)
+		// then we interrupt the thread if it is waiting
+		// (which it should be doing even if it was just restarted)
 		try {
 			Thread.sleep(timeout);
 			if (ct != null && ct.isWaiting) {
 				ct.interrupt();
-				Thread.sleep(0,250);
+				Thread.sleep(0, 250);
 			}
 			// we make sure that the logs are not cut
 			synchronized (YetiLog.class) {
@@ -352,10 +371,10 @@ public class YetiJavaTestManager extends YetiTestManager {
 			e.printStackTrace();
 		}
 
-		System.out.println("/** Yeti Threads::  nThreadStarted: "+nThreadsStarted+" nThreadStopped: "+nThreadsStopped+" **/");
+		System.out.println("/** Yeti Threads::  nThreadStarted: "
+		        + nThreadsStarted + " nThreadStopped: " + nThreadsStopped
+		        + " **/");
 	}
-
-
 
 	/**
 	 * Resets this class.
@@ -365,44 +384,46 @@ public class YetiJavaTestManager extends YetiTestManager {
 		nThreadsStopped = 0;
 		nThreadsStarted = 0;
 		System.out.println("Destroying workersGroup");
-		if (workersGroup!=null) {
-//			// ensure all the threads in the thread group are stopped before we
-//			// destroy it.
-//			// (from http://www.exampledepot.com/egs/java.lang/ListThreads.html)
-//			int numThreads = workersGroup.activeCount();
-//			Thread[] threads = new Thread[numThreads*2];
-//			numThreads = workersGroup.enumerate(threads, false);
-//			Thread thread;
-//			CallerThread cthread;
-//			System.out.println("There are " + numThreads + " running.");
-//			for (int i=0; i<numThreads; i++) {
-//				thread = threads[i];
-//				if (thread instanceof CallerThread) {
-//					cthread = (CallerThread)thread;
-//					cthread.stopRunning();
-//				}
-//				thread.interrupt();
-//				while (thread.isAlive()) {
-//					try {
-//						thread.sleep(50);
-//					} catch (InterruptedException e) {
-//					}
-//				}
-//				System.out.println("Nope :(");
-//			}
-//			
+		if (workersGroup != null) {
+			// // ensure all the threads in the thread group are stopped before
+			// we
+			// // destroy it.
+			// // (from
+			// http://www.exampledepot.com/egs/java.lang/ListThreads.html)
+			// int numThreads = workersGroup.activeCount();
+			// Thread[] threads = new Thread[numThreads*2];
+			// numThreads = workersGroup.enumerate(threads, false);
+			// Thread thread;
+			// CallerThread cthread;
+			// System.out.println("There are " + numThreads + " running.");
+			// for (int i=0; i<numThreads; i++) {
+			// thread = threads[i];
+			// if (thread instanceof CallerThread) {
+			// cthread = (CallerThread)thread;
+			// cthread.stopRunning();
+			// }
+			// thread.interrupt();
+			// while (thread.isAlive()) {
+			// try {
+			// thread.sleep(50);
+			// } catch (InterruptedException e) {
+			// }
+			// }
+			// System.out.println("Nope :(");
+			// }
+			//
 			// now we can destroy the thread group
 			try {
 				workersGroup.destroy();
 			} catch (IllegalThreadStateException ex) {
-				System.out.println("Threads are still running in the workers group");
+				System.out
+				        .println("Threads are still running in the workers group");
 				ex.printStackTrace();
 			}
 		}
 		System.out.println("Recreating workersGroup");
-		workersGroup= new ThreadGroup("workers");
+		workersGroup = new ThreadGroup("workers");
 		System.out.println("Returning");
 	}
-
 
 }
